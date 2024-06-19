@@ -8,6 +8,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.example.selfiepal.theme.InstagramAppTheme
 import com.example.selfiepal.ui.LandingActivity
+import com.example.selfiepal.ui.authentication.AuthStateChangeScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -17,7 +18,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             InstagramAppTheme {
-                Navigator(LandingActivity()) {
+                Navigator(AuthStateChangeScreen()) {
                     SlideTransition(it)
                 }
             }

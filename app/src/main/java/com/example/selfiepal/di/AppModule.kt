@@ -7,9 +7,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.example.selfiePal.R
 import com.example.selfiepal.network.NetworkService
 import com.example.selfiepal.preferences.Preferences
-import com.selfiePal.R
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -38,6 +38,13 @@ class AuthViewModel @Inject constructor(
     private val _responseMessage = MutableLiveData<String?>(null)
     val responseMessage: Flow<String?> = _responseMessage.asFlow()
 
+    private val _authState = MutableLiveData("")
+    val authState: Flow<String> = _authState.asFlow()
+
+
+    init {
+        preferences.getUserId().let { _authState.value = it }
+    }
 
     override fun onCleared() {
         super.onCleared()
@@ -86,7 +93,6 @@ class AuthViewModel @Inject constructor(
                 .addPart(requestBody)
                 .addFormDataPart("firstName", model.firstName)
                 .addFormDataPart("lastName", model.lastName)
-                .addFormDataPart("phone", model.phone)
                 .addFormDataPart("password", model.password)
                 .addFormDataPart("username", model.username)
                 .addFormDataPart("email", model.email)
@@ -101,7 +107,8 @@ class AuthViewModel @Inject constructor(
                 navigator?.push(BottomNavigationActivity())
             }
             Log.d("register", model.toString())
-            Log.d("res", response.body().toString())
+            Log.d("res", response.toString())
+            _isLoading.emit(false)
         } catch (e: Exception) {
             _isLoading.emit(false)
             Log.d("error", e.message.toString())

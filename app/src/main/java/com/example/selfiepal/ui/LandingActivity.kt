@@ -28,10 +28,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import com.example.selfiePal.R
 import com.example.selfiepal.theme.PrimaryColor
 import com.example.selfiepal.ui.authentication.SignInActivity
 import com.example.selfiepal.ui.authentication.signup.SignUpStep1
-import com.selfiePal.R
 
 class LandingActivity : Screen {
     @Composable
@@ -48,7 +48,7 @@ class LandingActivity : Screen {
                     contentDescription = null,
                     modifier = Modifier.fillMaxHeight(),
                     colorFilter = ColorFilter.tint(
-                        Color.Black.copy(alpha = 0.3f),
+                        Color.Black.copy(alpha = 0.6f),
                         BlendMode.Darken
                     ),
                     contentScale = ContentScale.FillHeight

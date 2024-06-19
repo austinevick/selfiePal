@@ -45,7 +45,7 @@ import androidx.compose.ui.window.DialogProperties
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import coil.compose.AsyncImage
-import com.selfiePal.R
+import com.example.selfiePal.R
 
 class HomeActivity(val modifier: Modifier) : Screen {
     @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)

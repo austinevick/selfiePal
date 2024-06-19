@@ -1,5 +1,6 @@
 package com.example.selfiepal.ui.authentication.signup
 
+import android.util.Patterns
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -8,27 +9,34 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
@@ -42,6 +50,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -60,7 +70,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class SignUpStep1 : Screen {
-    @OptIn(ExperimentalPermissionsApi::class)
+    @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val viewmodel = hiltViewModel<AuthViewModel>()
@@ -70,8 +80,11 @@ class SignUpStep1 : Screen {
         val navigator = LocalNavigator.current
 
         val locationPermission = rememberMultiplePermissionsState(
-            permissions = listOf(android.Manifest.permission.ACCESS_COARSE_LOCATION,
-                android.Manifest.permission.ACCESS_FINE_LOCATION))
+            permissions = listOf(
+                android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        )
 
         val showDropDown = remember { mutableStateOf(false) }
 
@@ -154,6 +167,12 @@ class SignUpStep1 : Screen {
                     onValueChange = {
                         firstname.value = it.trim()
                         isFirstnameError.value = it.isEmpty()
+                        if (firstname.value.isEmpty()) {
+                            isFirstnameError.value = true
+                            firstnameErrorMessage.value = "First name is required"
+                        }else{
+                            firstnameErrorMessage.value = ""
+                        }
                     },
                     placeholder = "First name",
                     isError = isFirstnameError.value,
@@ -169,6 +188,12 @@ class SignUpStep1 : Screen {
                     onValueChange = {
                         lastname.value = it.trim()
                         isLastnameError.value = it.isEmpty()
+                        if (lastname.value.isEmpty()) {
+                            isLastnameError.value = true
+                           lastnameErrorMessage.value = "Last name is required"
+                        }else{
+                            lastnameErrorMessage.value = ""
+                        }
                     },
                     placeholder = "Last name",
                     isError = isEmailError.value,
@@ -184,6 +209,16 @@ class SignUpStep1 : Screen {
                     onValueChange = {
                         email.value = it.trim()
                         isEmailError.value = it.isEmpty()
+                        val isValidEmail = Patterns.EMAIL_ADDRESS.matcher(it).matches()
+                       if (!isValidEmail){
+                           isEmailError.value = true
+                           emailErrorMessage.value = "Invalid email"
+                       }else if (email.value.isEmpty()) {
+                            isEmailError.value = true
+                            emailErrorMessage.value = "Email is required"
+                        }else {
+                            emailErrorMessage.value = ""
+                        }
                     },
                     placeholder = "Email",
                     isError = isEmailError.value,
@@ -206,8 +241,10 @@ class SignUpStep1 : Screen {
                     .padding(16.dp)
                 ) {
 
-                    Row(horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
                         Text(
                             text = if (selectedGender.value.isEmpty())
                                 "Gender" else selectedGender.value,
@@ -217,8 +254,10 @@ class SignUpStep1 : Screen {
                             fontWeight = if (selectedGender.value.isEmpty())
                                 FontWeight.Normal else FontWeight.W600
                         )
-                        Icon(Icons.Default.ArrowDropDown, tint = Color.Gray,
-                            contentDescription =null )
+                        Icon(
+                            Icons.Default.ArrowDropDown, tint = Color.Gray,
+                            contentDescription = null
+                        )
                     }
                     if (showDropDown.value) DropdownMenu(expanded = showDropDown.value,
                         modifier = Modifier.background(Color.White),
@@ -227,64 +266,63 @@ class SignUpStep1 : Screen {
                             DropdownMenuItem(text = { Text(text = it) },
                                 onClick = { selectedGender.value = it; showDropDown.value = false })
                         }
-                }
                     }
-                ErrorText(message = genderErrorMessage.value,errorModifier)
-
-
+                }
+                ErrorText(message = genderErrorMessage.value, errorModifier)
 
                 Spacer(modifier = Modifier.height(25.dp))
 
                 Button(
                     onClick = {
-//                        if (username.value.isEmpty() && firstname.value.isEmpty() &&
-//                            lastname.value.isEmpty() && email.value.isEmpty() &&
-//                            selectedGender.value.isEmpty()
-//                        ) {
-//                            usernameErrorMessage.value = "Username must be alphanumeric"
-//                            firstnameErrorMessage.value = "First name is required"
-//                            lastnameErrorMessage.value = "Last name is required"
-//                            emailErrorMessage.value = "Email is required"
-//                            genderErrorMessage.value = "Gender is required"
-//                            isUsernameError.value = true
-//                            isFirstnameError.value = true
-//                            isLastnameError.value = true
-//                            isEmailError.value = true
-//                            isGenderError.value = true
-//                            return@Button
-//                        }
-//
-//                        if (username.value.isEmpty()) {
-//                            isUsernameError.value = true
-//                            usernameErrorMessage.value = "Username is required"
-//                            return@Button
-//                        }
-//                        if (email.value.isEmpty()) {
-//                            isEmailError.value = true
-//                            emailErrorMessage.value = "Email is required"
-//                            return@Button
-//                        }
-//                        if (firstname.value.isEmpty()) {
-//                            isFirstnameError.value = true
-//                            firstnameErrorMessage.value = "First name is required"
-//                            return@Button
-//                        }
-//                        if (lastname.value.isEmpty()) {
-//                            isLastnameError.value = true
-//                            lastnameErrorMessage.value = "Last name is required"
-//                            return@Button
-//                        }
-//                        if (selectedGender.value.isEmpty()) {
-//                            isGenderError.value = true
-//                            genderErrorMessage.value = "Gender is required"
-//                            return@Button
-//                        }
+                        if (username.value.isEmpty() && firstname.value.isEmpty() &&
+                            lastname.value.isEmpty() && email.value.isEmpty() &&
+                            selectedGender.value.isEmpty()
+                        ) {
+                            usernameErrorMessage.value = "Username must be alphanumeric"
+                            firstnameErrorMessage.value = "First name is required"
+                            lastnameErrorMessage.value = "Last name is required"
+                            emailErrorMessage.value = "Email is required"
+                            genderErrorMessage.value = "Gender is required"
+                            isUsernameError.value = true
+                            isFirstnameError.value = true
+                            isLastnameError.value = true
+                            isEmailError.value = true
+                            isGenderError.value = true
+                            return@Button
+                        }
+
+                        if (username.value.isEmpty()) {
+                            isUsernameError.value = true
+                            usernameErrorMessage.value = "Username is required"
+                            return@Button
+                        }
+                        if (email.value.isEmpty()) {
+                            isEmailError.value = true
+                            emailErrorMessage.value = "Email is required"
+                            return@Button
+                        }
+                        if (firstname.value.isEmpty()) {
+                            isFirstnameError.value = true
+                            firstnameErrorMessage.value = "First name is required"
+                            return@Button
+                        }
+                        if (lastname.value.isEmpty()) {
+                            isLastnameError.value = true
+                            lastnameErrorMessage.value = "Last name is required"
+                            return@Button
+                        }
+                        if (selectedGender.value.isEmpty()) {
+                            isGenderError.value = true
+                            genderErrorMessage.value = "Gender is required"
+                            return@Button
+                        }
 
                         navigator?.push(
                             SignUpStep2(
                                 username.value, firstname.value,
-                                lastname.value,selectedGender.value,
-                                email.value)
+                                lastname.value, selectedGender.value,
+                                email.value
+                            )
                         )
                     },
                     enabled = !isLoading.value,
@@ -311,6 +349,7 @@ class SignUpStep1 : Screen {
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
+
 
 
     }

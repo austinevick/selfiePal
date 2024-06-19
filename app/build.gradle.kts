@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.selfiePal"
+    namespace = "com.example.selfiePal"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.selfiePal"
+        applicationId = "com.example.selfiePal"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -40,6 +40,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.14"

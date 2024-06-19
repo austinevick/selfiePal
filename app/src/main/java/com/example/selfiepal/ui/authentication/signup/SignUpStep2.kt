@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -33,11 +32,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import com.example.selfiePal.R
 import com.example.selfiepal.components.CustomTextField
 import com.example.selfiepal.components.CustomTopBar
 import com.example.selfiepal.components.ErrorText
 import com.example.selfiepal.theme.PrimaryColor
-import com.selfiePal.R
 
 data class SignUpStep2(
     val username:String,
@@ -150,23 +149,30 @@ data class SignUpStep2(
 
                 Button(
                     onClick = {
-//                        if(password.isEmpty() && confirmPassword.isEmpty()){
-//                            isPasswordError = true
-//                            isConfirmPasswordError = true
-//                            passwordErrorMessage = "Password is required"
-//                            confirmPassErrorMessage = "Confirm password is required"
-//                            return@Button
-//                        }
-//
-//                        if (password.isEmpty()) {
-//                            isPasswordError = true
-//                            return@Button
-//                        }
-//                        if (confirmPassword.isEmpty()) {
-//                            isConfirmPasswordError = true
-//                            return@Button
-//                        }
-                        navigator?.push(SignUpStep3())
+                        if(password.isEmpty() && confirmPassword.isEmpty()){
+                            isPasswordError = true
+                            isConfirmPasswordError = true
+                            passwordErrorMessage = "Password is required"
+                            confirmPassErrorMessage = "Confirm password is required"
+                            return@Button
+                        }
+
+                        if (password.isEmpty()) {
+                            isPasswordError = true
+                            return@Button
+                        }
+                        if (confirmPassword.isEmpty()) {
+                            isConfirmPasswordError = true
+                            return@Button
+                        }
+                        navigator?.push(SignUpStep3(
+                            username = username,
+                            firstName = firstName,
+                            lastName = lastName,
+                            gender = gender,
+                            email = email,
+                            password = password
+                        ))
                     },
 
                     modifier = modifier

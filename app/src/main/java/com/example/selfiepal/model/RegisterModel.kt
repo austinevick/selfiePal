@@ -9,7 +9,6 @@ data class RegisterModel(
     val username: String,
     val firstName: String,
     val lastName: String,
-    val phone: String,
     val gender: String,
     val location: String,
     val password: String,

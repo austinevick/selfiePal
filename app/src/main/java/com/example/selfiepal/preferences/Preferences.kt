@@ -1,6 +1,7 @@
 package com.example.selfiepal.preferences
 
 import android.content.SharedPreferences
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class Preferences @Inject constructor(private val preferences: SharedPreferences) {
@@ -22,7 +23,7 @@ class Preferences @Inject constructor(private val preferences: SharedPreferences
         return preferences.getString(token, "") ?: ""
     }
 
-    fun getUserId(): String {
+    fun getUserId():String {
         return preferences.getString(userId, "") ?: ""
     }
 
