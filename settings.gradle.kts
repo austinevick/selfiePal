@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "instagram App"
+rootProject.name = "SelfiePal"
 include(":app")
  

@@ -12,7 +12,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
     <application
-        android:name=".MyApplication"
+        android:name="com.example.selfiepal.MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -23,12 +23,12 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:windowSoftInputMode="adjustResize"
-        android:theme="@style/Theme.InstagramApp"
+        android:theme="@style/Theme.SelfiePal"
         tools:targetApi="tiramisu">
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.selfiepal.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.InstagramApp">
+            android:theme="@style/Theme.SelfiePal">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

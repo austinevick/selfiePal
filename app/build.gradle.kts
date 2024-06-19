@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.instagramapp"
+    namespace = "com.selfiePal"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.instagramapp"
+        applicationId = "com.selfiePal"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
