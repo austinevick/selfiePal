@@ -35,9 +35,14 @@ class AuthViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    private val _responseMessage = MutableLiveData("")
-    val responseMessage: Flow<String> = _responseMessage.asFlow()
+    private val _responseMessage = MutableLiveData<String?>(null)
+    val responseMessage: Flow<String?> = _responseMessage.asFlow()
 
+
+    override fun onCleared() {
+        super.onCleared()
+        _responseMessage.value = null
+    }
 
     suspend fun login(
         model: LoginModel,

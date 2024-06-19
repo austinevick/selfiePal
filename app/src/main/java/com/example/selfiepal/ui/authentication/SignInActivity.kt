@@ -76,7 +76,7 @@ class SignInActivity : Screen {
                 CustomTextField(
                     value = username.value,
                     onValueChange = {
-                        username.value = it
+                        username.value = it.trim()
                         isUsernameError.value = it.isEmpty()
                         if (!isValidEmail(username.value) && !isValidUsername(username.value)) {
                             usernameErrorMessage.value = "Invalid username or email"
@@ -96,7 +96,7 @@ class SignInActivity : Screen {
                 CustomTextField(
                     value = password.value,
                     onValueChange = {
-                        password.value = it
+                        password.value = it.trim()
                         isPasswordError.value = it.isEmpty()
                         if (password.value.isEmpty()) {
                             passwordErrorMessage.value = "Password is required"

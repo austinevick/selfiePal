@@ -10,6 +10,8 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
         android:name="com.example.selfiepal.MyApplication"
@@ -22,12 +24,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
-        android:windowSoftInputMode="adjustResize"
         android:theme="@style/Theme.SelfiePal"
         tools:targetApi="tiramisu">
         <activity
             android:name="com.example.selfiepal.MainActivity"
             android:exported="true"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.SelfiePal">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

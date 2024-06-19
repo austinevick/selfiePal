@@ -1,20 +1,30 @@
 package com.example.selfiepal.ui.authentication.signup
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -29,7 +39,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -41,10 +53,14 @@ import com.example.selfiepal.theme.PrimaryColor
 import com.example.selfiepal.ui.authentication.SignInActivity
 import com.example.selfiepal.utilities.isValidUsername
 import com.example.selfiepal.viewmodel.AuthViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class SignUpStep1 : Screen {
+    @OptIn(ExperimentalPermissionsApi::class)
     @Composable
     override fun Content() {
         val viewmodel = hiltViewModel<AuthViewModel>()
@@ -53,16 +69,23 @@ class SignUpStep1 : Screen {
         val scope = rememberCoroutineScope()
         val navigator = LocalNavigator.current
 
+        val locationPermission = rememberMultiplePermissionsState(
+            permissions = listOf(android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                android.Manifest.permission.ACCESS_FINE_LOCATION))
+
+        val showDropDown = remember { mutableStateOf(false) }
+
         val username = remember { mutableStateOf("") }
         val email = remember { mutableStateOf("") }
         val lastname = remember { mutableStateOf("") }
         val firstname = remember { mutableStateOf("") }
-        val password = remember { mutableStateOf("") }
+        val location = remember { mutableStateOf("") }
         val gender = remember { mutableStateListOf("Male", "Female", "I prefer not to say") }
         val selectedGender = remember { mutableStateOf("") }
         val snackbarHostState = remember { SnackbarHostState() }
+
         val isUsernameError = remember { mutableStateOf(false) }
-        val isPasswordError = remember { mutableStateOf(false) }
+        val isGenderError = remember { mutableStateOf(false) }
         val isEmailError = remember { mutableStateOf(false) }
         val isFirstnameError = remember { mutableStateOf(false) }
         val isLastnameError = remember { mutableStateOf(false) }
@@ -71,6 +94,7 @@ class SignUpStep1 : Screen {
         val firstnameErrorMessage = remember { mutableStateOf("") }
         val lastnameErrorMessage = remember { mutableStateOf("") }
         val emailErrorMessage = remember { mutableStateOf("") }
+        val genderErrorMessage = remember { mutableStateOf("") }
 
 
         Scaffold(topBar = {
@@ -86,6 +110,7 @@ class SignUpStep1 : Screen {
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
                     .padding(innerPadding)
+                    .imePadding()
             ) {
                 val modifier = Modifier.padding(horizontal = 16.dp)
                 val errorModifier = Modifier
@@ -97,15 +122,15 @@ class SignUpStep1 : Screen {
                 CustomTextField(
                     value = username.value,
                     onValueChange = {
-                        username.value = it
+                        username.value = it.trim()
                         isUsernameError.value = it.isEmpty()
                         scope.launch {
-                            delay(1000)
+                            delay(2000)
                             viewmodel.checkIfUsernameExists(it)
                         }
-                        if(!isValidUsername(it)){
+                        if (!isValidUsername(it)) {
                             usernameErrorMessage.value = "Username must be alphanumeric"
-                        }else
+                        } else
                             usernameErrorMessage.value = ""
                     },
                     placeholder = "Username",
@@ -116,90 +141,151 @@ class SignUpStep1 : Screen {
                             CircularLoadingProgress(color = PrimaryColor)
                     }
                 )
-                ErrorText(message = responseMessage.value.ifEmpty
-                { usernameErrorMessage.value },
-                    color = if (usernameErrorMessage.value
-                        .contentEquals("available")) Color.Green else Color.Red,
-                    modifier = errorModifier)
-                Spacer(modifier = Modifier.height(16.dp))
+                ErrorText(
+                    message = if (responseMessage.value != null)
+                        "${responseMessage.value}" else
+                        usernameErrorMessage.value,
+                    color = Color.Red,
+                    modifier = errorModifier
+                )
+                Spacer(modifier = Modifier.height(6.dp))
                 CustomTextField(
                     value = firstname.value,
                     onValueChange = {
-                        firstname.value = it
+                        firstname.value = it.trim()
                         isFirstnameError.value = it.isEmpty()
                     },
                     placeholder = "First name",
                     isError = isFirstnameError.value,
                     modifier = modifier
                 )
-                ErrorText(message = firstnameErrorMessage.value,
-                    modifier = errorModifier)
-                Spacer(modifier = Modifier.height(16.dp))
+                ErrorText(
+                    message = firstnameErrorMessage.value,
+                    modifier = errorModifier
+                )
+                Spacer(modifier = Modifier.height(6.dp))
                 CustomTextField(
                     value = lastname.value,
                     onValueChange = {
-                        lastname.value = it
+                        lastname.value = it.trim()
                         isLastnameError.value = it.isEmpty()
                     },
                     placeholder = "Last name",
                     isError = isEmailError.value,
                     modifier = modifier
                 )
-                ErrorText(message = lastnameErrorMessage.value,
-                    modifier = errorModifier)
-                Spacer(modifier = Modifier.height(16.dp))
+                ErrorText(
+                    message = lastnameErrorMessage.value,
+                    modifier = errorModifier
+                )
+                Spacer(modifier = Modifier.height(6.dp))
                 CustomTextField(
                     value = email.value,
                     onValueChange = {
-                        email.value = it
+                        email.value = it.trim()
                         isEmailError.value = it.isEmpty()
                     },
                     placeholder = "Email",
                     isError = isEmailError.value,
                     modifier = modifier
                 )
-                ErrorText(message = emailErrorMessage.value,
-                    modifier = errorModifier)
+                ErrorText(
+                    message = emailErrorMessage.value,
+                    modifier = errorModifier
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+                Box(modifier = modifier
+                    .fillMaxWidth()
+                    .clickable { showDropDown.value = true }
+                    .border(
+                        1.dp, if (isGenderError.value) Color.Red else
+                            Color.Gray.copy(alpha = 0.2f),
+                        RoundedCornerShape(8.dp)
+                    )
+                    .padding(16.dp)
+                ) {
+
+                    Row(horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = if (selectedGender.value.isEmpty())
+                                "Gender" else selectedGender.value,
+                            color = if (selectedGender.value.isEmpty())
+                                Color.Gray else Color.Black,
+                            fontSize = 16.sp,
+                            fontWeight = if (selectedGender.value.isEmpty())
+                                FontWeight.Normal else FontWeight.W600
+                        )
+                        Icon(Icons.Default.ArrowDropDown, tint = Color.Gray,
+                            contentDescription =null )
+                    }
+                    if (showDropDown.value) DropdownMenu(expanded = showDropDown.value,
+                        modifier = Modifier.background(Color.White),
+                        onDismissRequest = { showDropDown.value = false }) {
+                        gender.forEach {
+                            DropdownMenuItem(text = { Text(text = it) },
+                                onClick = { selectedGender.value = it; showDropDown.value = false })
+                        }
+                }
+                    }
+                ErrorText(message = genderErrorMessage.value,errorModifier)
+
+
 
                 Spacer(modifier = Modifier.height(25.dp))
 
                 Button(
                     onClick = {
-                        if (username.value.isEmpty()&&firstname.value.isEmpty()&&
-                            lastname.value.isEmpty()&&email.value.isEmpty()) {
-                            usernameErrorMessage.value = "Username must be alphanumeric"
-                            firstnameErrorMessage.value = "First name is required"
-                            lastnameErrorMessage.value = "Last name is required"
-                            emailErrorMessage.value = "Email is required"
-                            isUsernameError.value = true
-                            isFirstnameError.value = true
-                            isLastnameError.value = true
-                            isEmailError.value = true
-                            return@Button
-                        }
+//                        if (username.value.isEmpty() && firstname.value.isEmpty() &&
+//                            lastname.value.isEmpty() && email.value.isEmpty() &&
+//                            selectedGender.value.isEmpty()
+//                        ) {
+//                            usernameErrorMessage.value = "Username must be alphanumeric"
+//                            firstnameErrorMessage.value = "First name is required"
+//                            lastnameErrorMessage.value = "Last name is required"
+//                            emailErrorMessage.value = "Email is required"
+//                            genderErrorMessage.value = "Gender is required"
+//                            isUsernameError.value = true
+//                            isFirstnameError.value = true
+//                            isLastnameError.value = true
+//                            isEmailError.value = true
+//                            isGenderError.value = true
+//                            return@Button
+//                        }
+//
+//                        if (username.value.isEmpty()) {
+//                            isUsernameError.value = true
+//                            usernameErrorMessage.value = "Username is required"
+//                            return@Button
+//                        }
+//                        if (email.value.isEmpty()) {
+//                            isEmailError.value = true
+//                            emailErrorMessage.value = "Email is required"
+//                            return@Button
+//                        }
+//                        if (firstname.value.isEmpty()) {
+//                            isFirstnameError.value = true
+//                            firstnameErrorMessage.value = "First name is required"
+//                            return@Button
+//                        }
+//                        if (lastname.value.isEmpty()) {
+//                            isLastnameError.value = true
+//                            lastnameErrorMessage.value = "Last name is required"
+//                            return@Button
+//                        }
+//                        if (selectedGender.value.isEmpty()) {
+//                            isGenderError.value = true
+//                            genderErrorMessage.value = "Gender is required"
+//                            return@Button
+//                        }
 
-                        if (username.value.isEmpty()) {
-                            isUsernameError.value = true
-                            usernameErrorMessage.value = "Username is required"
-                            return@Button
-                        }
-                        if (email.value.isEmpty()) {
-                            isEmailError.value = true
-                            emailErrorMessage.value = "Email is required"
-                            return@Button
-                        }
-                        if (firstname.value.isEmpty()) {
-                            isFirstnameError.value = true
-                            firstnameErrorMessage.value = "First name is required"
-                            return@Button
-                        }
-                        if (lastname.value.isEmpty()) {
-                            isLastnameError.value = true
-                            lastnameErrorMessage.value = "Last name is required"
-                            return@Button
-                        }
-
-                        navigator?.push(SignUpStep2())
+                        navigator?.push(
+                            SignUpStep2(
+                                username.value, firstname.value,
+                                lastname.value,selectedGender.value,
+                                email.value)
+                        )
                     },
                     enabled = !isLoading.value,
                     modifier = modifier

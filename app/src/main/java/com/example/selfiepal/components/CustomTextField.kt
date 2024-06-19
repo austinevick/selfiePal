@@ -49,7 +49,7 @@ fun CustomTextField(
         textStyle = TextStyle(
             color = Color.Black,
             fontSize = 16.sp,
-            fontWeight = FontWeight.W800
+            fontWeight = FontWeight.W600
         ),
         colors = TextFieldDefaults.colors(
             focusedIndicatorColor = Color.Transparent,
