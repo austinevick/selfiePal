@@ -76,8 +76,8 @@ dependencies {
     // Retrofit
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
-    // Volley
-    implementation(libs.volley)
+
+    implementation(libs.okhttp)
 
     // CameraX
     implementation(libs.androidx.camera.core)

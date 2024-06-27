@@ -23,7 +23,7 @@ interface NetworkService {
 
     // AUTHENTICATION
     @POST("user/login")
-    suspend fun login(@Body model: LoginModel): Response<AuthResponseModel>
+    suspend fun login(@Body model: LoginModel): AuthResponseModel
 
     @POST("user/register")
     suspend fun register(@Body requestBody: RequestBody): Response<AuthResponseModel>

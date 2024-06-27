@@ -2,12 +2,18 @@ package com.example.selfiepal.viewmodel
 
 import android.app.Application
 import android.content.Context
+import android.net.http.HttpException
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresExtension
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asFlow
 import cafe.adriel.voyager.navigator.Navigator
+import com.example.selfiePal.R
+import com.example.selfiepal.model.AuthResponseModel
 import com.example.selfiepal.model.LoginModel
 import com.example.selfiepal.model.RegisterModel
 import com.example.selfiepal.network.NetworkService
@@ -51,6 +57,7 @@ class AuthViewModel @Inject constructor(
         _responseMessage.value = null
     }
 
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     suspend fun login(
         model: LoginModel,
         navigator: Navigator?,
@@ -59,21 +66,29 @@ class AuthViewModel @Inject constructor(
         try {
             _isLoading.emit(true)
             val response = networkService.login(model)
-            Log.d("register", model.toString())
-            Log.d("res", response.toString())
+            when (response.status) {
+                200 -> {
+                    preferences.saveToken(response.token)
+                    preferences.saveUserId(response.data.id)
+                    navigator?.push(BottomNavigationActivity())
+                }
 
-            val data = response.body()
-            if (response.code() == 200) {
-                preferences.saveToken(data!!.token)
-                preferences.saveUserId(data.data.id)
-                navigator?.push(BottomNavigationActivity())
-            } else
-                _isLoading.emit(false)
-            response.body()?.let { Log.d("res", it.message) }
-            snackbarState.showSnackbar("Invalid credentials")
-        } catch (e: Exception) {
+                400 -> {
+                    _isLoading.emit(false)
+                    Log.d("res", response.message)
+                    snackbarState.showSnackbar("Invalid credentials")
+                }
+
+                401 -> {
+                    _isLoading.emit(false)
+                    Log.d("res", response.message)
+                    snackbarState.showSnackbar("Invalid credentials")
+                }
+            }
+
+        } catch (e: HttpException) {
             _isLoading.emit(false)
-            snackbarState.showSnackbar(e.message.toString())
+            snackbarState.showSnackbar(R.string.something_went_wrong.toString())
             Log.d("error", e.message.toString())
         }
     }
@@ -123,9 +138,9 @@ class AuthViewModel @Inject constructor(
             Log.d("res", response.body().toString())
             _isLoading.emit(false)
 
-           response.body().let {
-               _responseMessage.value = response.body()?.message
-           }
+            response.body().let {
+                _responseMessage.value = response.body()?.message
+            }
         } catch (e: Exception) {
             _isLoading.emit(false)
             _responseMessage.value = e.message.toString()

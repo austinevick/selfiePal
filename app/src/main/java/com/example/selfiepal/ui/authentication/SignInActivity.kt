@@ -1,5 +1,7 @@
 package com.example.selfiepal.ui.authentication
 
+import android.os.Build
+import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -43,6 +45,7 @@ import com.example.selfiepal.viewmodel.AuthViewModel
 import kotlinx.coroutines.launch
 
 class SignInActivity : Screen {
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     @Composable
     override fun Content() {
         val viewmodel = hiltViewModel<AuthViewModel>()
@@ -92,7 +95,7 @@ class SignInActivity : Screen {
                         .padding(start = 16.dp)
                         .align(Alignment.Start)
                     )
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 CustomTextField(
                     value = password.value,
                     onValueChange = {

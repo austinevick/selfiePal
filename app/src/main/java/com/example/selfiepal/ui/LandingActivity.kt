@@ -48,7 +48,7 @@ class LandingActivity : Screen {
                     contentDescription = null,
                     modifier = Modifier.fillMaxHeight(),
                     colorFilter = ColorFilter.tint(
-                        Color.Black.copy(alpha = 0.6f),
+                        Color.Black.copy(alpha = 0.4f),
                         BlendMode.Darken
                     ),
                     contentScale = ContentScale.FillHeight
